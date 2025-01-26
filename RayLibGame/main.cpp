@@ -6,15 +6,15 @@
 using namespace std;
 
 Color custom = {220, 220, 220, 255};
-Color woi = {180, 180, 180, 255};
 
+const int LebarWindow = 860;
 const int LebarLayar = 600;
 const int TinggiLayar = 600;
 const int UkuranGrid = 20;
 const int LebarGrid = LebarLayar / UkuranGrid;
 const int TinggiGrid = TinggiLayar / UkuranGrid;
 
-enum tombol {UP, DOWN, LEFT, RIGHT};
+enum tombol {UP = 0, DOWN, RIGHT, LEFT};
 
 enum Jenisbuah {BIASA, BONUS, RACUN, MINSPD, PLUSSPD};
 
@@ -101,7 +101,7 @@ void ResetGame(Ular& ular, Makanan& buah, bool& gameover, int& score, float& kec
 }
 
 int main() {
-    InitWindow(860, TinggiLayar, "ULAR VEGAN");
+    InitWindow(LebarWindow, TinggiLayar, "ULAR VEGAN");
     SetTargetFPS(60);
 
     Texture2D Grass = LoadTexture("texture/rumput.png");
@@ -112,6 +112,13 @@ int main() {
     Texture2D HeadUp = LoadTexture("texture/kepalaatas.png");
     Texture2D HeadDown = LoadTexture("texture/kepalabawah.png");
     Texture2D Body = LoadTexture("texture/badan.png");
+
+    Texture2D ArahKepala[] = {HeadUp, HeadDown, HeadRight, HeadLeft};
+
+    Texture2D TipeApel[] = {apple, AppleBonus};
+    Color TipeWarnaApel[] = {RED, PURPLE, WHITE, SKYBLUE, GOLD};    
+    int nilaiAryApel;
+    int nilaiAryWarnaApel;
 
     InitAudioDevice();
 
@@ -156,10 +163,15 @@ int main() {
                 UkuranUlar kepala = ular.tubuh.front();
                 UkuranUlar ekor = ular.tubuh.back();
 
-                if (ular.arah == UP) kepala.y--;
-                else if (ular.arah == DOWN) kepala.y++;
-                else if (ular.arah == RIGHT) kepala.x++;
-                else if (ular.arah == LEFT) kepala.x--;
+                if (ular.arah == UP){
+                    kepala.y--;
+                }else if (ular.arah == DOWN){
+                    kepala.y++;
+                }else if (ular.arah == RIGHT){
+                    kepala.x++;
+                }else if (ular.arah == LEFT){
+                    kepala.x--;
+                }
 
                 if (kepala.x == buah.x && kepala.y == buah.y) {
                     PlaySound(eat);
@@ -180,15 +192,12 @@ int main() {
                     } else if (buah.jenisbuah == MINSPD) {
                         kecepatanSementara = 4.0f;
                         haveTempSpd =true;
-
                         score+=2;
                     } else if (buah.jenisbuah == PLUSSPD) {
                         kecepatanSementara = 15.0f;
                         haveTempSpd = true;
-
                         score+=2;
                     }
-
                     buah = BuatMakanan(ular);
                 } else {
                     ular.tubuh.pop_back();
@@ -230,16 +239,23 @@ int main() {
             }
         }
 
-        if (ular.arah == UP) DrawTexture(HeadUp, ular.tubuh.front().x * UkuranGrid, ular.tubuh.front().y * UkuranGrid, WHITE);
-        else if (ular.arah == DOWN) DrawTexture(HeadDown, ular.tubuh.front().x * UkuranGrid, ular.tubuh.front().y * UkuranGrid, WHITE);
-        else if (ular.arah == RIGHT) DrawTexture(HeadRight, ular.tubuh.front().x * UkuranGrid, ular.tubuh.front().y * UkuranGrid, WHITE);
-        else if (ular.arah == LEFT) DrawTexture(HeadLeft, ular.tubuh.front().x * UkuranGrid, ular.tubuh.front().y * UkuranGrid, WHITE);
+        DrawTexture(ArahKepala[ular.arah], ular.tubuh.front().x * UkuranGrid, ular.tubuh.front().y * UkuranGrid, WHITE);
 
-        if (buah.jenisbuah == BIASA) DrawTexture(apple, buah.x * UkuranGrid, buah.y * UkuranGrid, RED);
-        else if (buah. jenisbuah == RACUN) DrawTexture(apple, buah.x * UkuranGrid, buah.y * UkuranGrid, PURPLE);
-        else if (buah. jenisbuah == BONUS) DrawTexture(AppleBonus, buah.x * UkuranGrid, buah.y * UkuranGrid, WHITE);
-        else if (buah. jenisbuah == MINSPD) DrawTexture(apple, buah.x * UkuranGrid, buah.y * UkuranGrid, SKYBLUE);
-        else if (buah. jenisbuah == PLUSSPD) DrawTexture(apple, buah.x * UkuranGrid, buah.y * UkuranGrid, GOLD);
+        nilaiAryApel = 0;
+        if (buah.jenisbuah == BIASA){
+            nilaiAryWarnaApel = 0;
+        }else if (buah. jenisbuah == RACUN){
+            nilaiAryWarnaApel = 1;
+        }else if (buah. jenisbuah == BONUS){
+            nilaiAryWarnaApel = 2;
+            nilaiAryApel = 1;
+        }else if (buah. jenisbuah == MINSPD){
+            nilaiAryWarnaApel = 3;
+        }else if (buah. jenisbuah == PLUSSPD){
+            nilaiAryWarnaApel = 4;
+        }
+
+        DrawTexture(TipeApel[nilaiAryApel], buah.x * UkuranGrid, buah.y * UkuranGrid, TipeWarnaApel[nilaiAryWarnaApel]);
         
         DrawText("VEGAN SNAKE", LebarLayar + 2 * UkuranGrid, UkuranGrid, 25, RAYWHITE);
 
